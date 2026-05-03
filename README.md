@@ -1,19 +1,19 @@
-# MrilSeven — Modern Editorial Platform
+# MrilSeven — Modern Editorial Platform `v0.1.0`
 
 **MrilSeven** adalah platform blog modern dengan estetika premium yang terinspirasi oleh Medium. Dibangun menggunakan teknologi terbaru untuk memberikan pengalaman menulis dan membaca yang mulus, cepat, dan elegan.
 
-![Aesthetic Banner](https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=1200)
+![Aesthetic Banner](public/banner-mrilseven.png)
 
 ## ✨ Fitur Utama
 
-- **Premium Writing Experience**: Editor Markdown interaktif dengan toolbar lengkap dan pratinjau real-time.
+- **Premium Writing Experience**: Rich Text Editor (Tiptap) yang mendukung Markdown, highlight kode, task lists, dan image upload terintegrasi.
 - **Smart Analytics**: 
   - **Reading Time**: Estimasi waktu baca otomatis berdasarkan panjang konten.
   - **Real-time Views**: Penghitung jumlah pembaca yang akurat di setiap artikel.
 - **Content Management System (CMS)**:
   - **Drafting System**: Simpan tulisan sebagai draft atau publikasikan secara instan.
   - **Topic Tagging**: Kategorikan cerita Anda dengan sistem tagging yang dinamis.
-- **Admin Dashboard**: Dashboard eksklusif untuk memonitor performa (Total Views, Drafts, dan Stories).
+- **Admin Dashboard**: Dashboard eksklusif dengan visualisasi data (Recharts) untuk memonitor performa (Total Views, Drafts, dan Stories).
 - **High Performance**:
   - **Server-Side Rendering (SSR)** untuk SEO maksimal dan loading awal yang instan.
   - **Lazy Loading** untuk editor berat guna mengoptimalkan ukuran bundle JavaScript.
@@ -21,12 +21,14 @@
 
 ## 🚀 Tech Stack
 
-- **Framework**: [Next.js 15+](https://nextjs.org) (App Router)
-- **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com) (Modern utility-first styling)
+- **Framework**: [Next.js 16](https://nextjs.org) (App Router)
+- **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com) (Engine v4)
 - **Database**: [MongoDB](https://www.mongodb.com) dengan [Mongoose](https://mongoosejs.com)
-- **State Management**: [TanStack React Query](https://tanstack.com/query/latest)
+- **State Management**: [TanStack React Query v5](https://tanstack.com/query/latest)
+- **Editor**: [Tiptap](https://tiptap.dev) (WYSIWYG Markdown-ready) & [React Markdown](https://github.com/remarkjs/react-markdown)
+- **Icons**: [Lucide React](https://lucide.dev)
+- **Visuals**: [Recharts](https://recharts.org) (Dashboard Analytics)
 - **Typography**: [Lora](https://fonts.google.com/specimen/Lora) (Serif) & [Inter](https://fonts.google.com/specimen/Inter) (Sans)
-- **Editor**: [React Markdown](https://github.com/remarkjs/react-markdown)
 
 ## 🛠️ Instalasi & Konfigurasi
 
