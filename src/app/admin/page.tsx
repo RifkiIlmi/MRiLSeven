@@ -5,6 +5,7 @@ import type { PostData } from "@/types";
 import { fetcher } from "@/lib/fetcher";
 import { API_ENDPOINTS, ROUTES } from "@/lib/constants";
 import { useAuth } from "@/components/AuthContext";
+import AnalyticsDashboard from "@/components/AnalyticsDashboard";
 
 export default function AdminPage() {
   const { user } = useAuth();
@@ -61,8 +62,7 @@ export default function AdminPage() {
     );
   }
 
-  const totalViews = posts.reduce((acc, post) => acc + (post.views || 0), 0);
-  const totalDrafts = posts.filter(post => !post.published).length;
+
 
   return (
     <div className="max-w-6xl mx-auto py-6">
@@ -89,22 +89,9 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 px-4 md:px-0">
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-          <div className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Total Stories</div>
-          <div className="text-3xl font-serif font-bold text-gray-900">{posts.length}</div>
-        </div>
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-          <div className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Drafts</div>
-          <div className="text-3xl font-serif font-bold text-gray-900">{totalDrafts}</div>
-        </div>
-        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-          <div className="text-gray-400 text-xs font-bold uppercase tracking-wider mb-1">Total Views</div>
-          <div className="text-3xl font-serif font-bold text-gray-900">
-            {totalViews > 1000 ? (totalViews / 1000).toFixed(1) + "k" : totalViews}
-          </div>
-        </div>
+      {/* Analytics & Stats */}
+      <div className="mb-12 px-4 md:px-0">
+        <AnalyticsDashboard posts={posts} />
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mx-4 md:mx-0">

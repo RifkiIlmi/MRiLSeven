@@ -19,14 +19,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        codeBlock: false, // We'll use a better one or just starter kit's default
-      }),
-      Underline,
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: "text-blue-600 underline",
-        },
+        codeBlock: false, 
       }),
       Image.configure({
         HTMLAttributes: {
@@ -38,12 +31,13 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
         placeholder: "Tulis cerita Anda di sini...",
       }),
       Markdown.configure({
-        html: false, // Keep it pure markdown in DB
+        html: true, // Allow HTML for marks like underline
         tightLists: true,
         tightListClass: "tight",
       }),
     ],
     content: value,
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       // @ts-expect-error - getMarkdown exists in tiptap-markdown storage
       const markdown = editor.storage.markdown.getMarkdown();
