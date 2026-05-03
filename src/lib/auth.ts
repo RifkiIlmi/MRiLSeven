@@ -1,5 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import bcrypt from "bcryptjs";
+import User from "@/models/User";
+import { connectDB } from "./mongodb";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
@@ -14,34 +16,54 @@ export async function generateToken(
 
 export async function verifyToken(
   token: string,
-): Promise<Record<string, unknown> | null> {
+): Promise<Record<string, any> | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload as Record<string, unknown>;
+    return payload as Record<string, any>;
   } catch {
     return null;
   }
 }
 
-export async function verifyAdmin(
+/**
+ * Otentikasi user dari database
+ */
+export async function authenticateUser(
   email: string,
   password: string,
-): Promise<boolean> {
+): Promise<{ id: string; email: string; name: string; role: string } | null> {
+  await connectDB();
+  
+  // 1. Cek User di Database
+  const user = await User.findOne({ email });
+  if (user) {
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (isMatch) {
+      return {
+        id: user._id.toString(),
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      };
+    }
+  }
+
+  // 2. Fallback ke Super Admin dari .env (untuk setup awal)
   const adminEmail = process.env.ADMIN_EMAIL || "admin@blog.com";
   const b64Hash = process.env.ADMIN_PASSWORD_HASH_B64 || "";
   
-  if (email !== adminEmail) return false;
-  if (!b64Hash) return false;
-
-  try {
-    // Decode hash dari Base64 untuk menghindari masalah simbol "$" di .env
+  if (email === adminEmail && b64Hash) {
     const adminPasswordHash = Buffer.from(b64Hash, 'base64').toString();
-    return bcrypt.compare(password, adminPasswordHash);
-  } catch (error) {
-    console.error("Auth Error:", error);
-    return false;
+    const isMatch = await bcrypt.compare(password, adminPasswordHash);
+    if (isMatch) {
+      return {
+        id: "super-admin",
+        email: adminEmail,
+        name: "Super Admin",
+        role: "admin",
+      };
+    }
   }
-}
 
-// Jalankan ini sekali untuk hash password admin:
-// bcrypt.hash('passwordkamu', 12).then(console.log)
+  return null;
+}

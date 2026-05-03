@@ -4,8 +4,10 @@ import Link from "next/link";
 import type { PostData } from "@/types";
 import { fetcher } from "@/lib/fetcher";
 import { API_ENDPOINTS, ROUTES } from "@/lib/constants";
+import { useAuth } from "@/components/AuthContext";
 
 export default function AdminPage() {
+  const { user } = useAuth();
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -13,7 +15,9 @@ export default function AdminPage() {
   useEffect(() => {
     async function fetchPosts() {
       try {
-        const { data } = await fetcher<PostData[]>(`${API_ENDPOINTS.POSTS}?limit=100&all=true`);
+        const { data } = await fetcher<PostData[]>(`${API_ENDPOINTS.POSTS}?limit=100&all=true`, {
+          cache: "no-store"
+        });
         setPosts(data || []);
       } catch (err) {
         setError(
@@ -67,12 +71,22 @@ export default function AdminPage() {
           <h1 className="text-4xl font-serif font-bold text-gray-900 mb-2">Dashboard</h1>
           <p className="text-gray-500">Manage your stories and monitor performance.</p>
         </div>
-        <Link
-          href={ROUTES.ADMIN_NEW_POST}
-          className="bg-gray-900 text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-gray-700 transition-all shadow-lg shadow-gray-200"
-        >
-          Write a story
-        </Link>
+        <div className="flex gap-4">
+          {user?.role === "admin" && (
+            <Link
+              href="/admin/users"
+              className="border border-gray-200 text-gray-600 px-6 py-3 rounded-full text-sm font-medium hover:bg-gray-50 transition-all"
+            >
+              Manage Users
+            </Link>
+          )}
+          <Link
+            href={ROUTES.ADMIN_NEW_POST}
+            className="bg-gray-900 text-white px-6 py-3 rounded-full text-sm font-medium hover:bg-gray-700 transition-all shadow-lg shadow-gray-200"
+          >
+            Write a story
+          </Link>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -99,6 +113,7 @@ export default function AdminPage() {
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
                 <th className="text-left px-6 py-4 font-serif font-bold text-gray-900">Title</th>
+                <th className="text-left px-6 py-4 font-serif font-bold text-gray-900">Author</th>
                 <th className="text-left px-6 py-4 font-serif font-bold text-gray-900">Status</th>
                 <th className="text-left px-6 py-4 font-serif font-bold text-gray-900">Views</th>
                 <th className="text-left px-6 py-4 font-serif font-bold text-gray-900">Date</th>
@@ -115,6 +130,12 @@ export default function AdminPage() {
                     >
                       {post.title}
                     </Link>
+                  </td>
+                  <td className="px-6 py-5 whitespace-nowrap">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-[10px] text-gray-400">👤</div>
+                      <span className="text-sm text-gray-600">{post.author || "Admin"}</span>
+                    </div>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap">
                     {post.published ? (

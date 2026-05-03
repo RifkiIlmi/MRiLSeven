@@ -20,9 +20,23 @@ export async function GET(req: NextRequest) {
     // Query filter
     const all = searchParams.get("all") === "true";
     let filter: Record<string, unknown> = { published: true };
-    
+
+    // Auth Check untuk akses administratif
+    const token = req.cookies.get("auth_token")?.value;
+    const payload = token ? await verifyToken(token) : null;
+
     if (all) {
-      filter = {};
+      if (!payload) {
+        return errorResponse("Akses ditolak", 401);
+      }
+
+      // Jika Author, hanya boleh lihat miliknya sendiri
+      if (payload.role === "author") {
+        filter = { author_id: payload.id };
+      } else {
+        // Jika Admin, bisa lihat semua
+        filter = {};
+      }
     }
 
     if (search) {
@@ -67,15 +81,17 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
-    
-    // Keamanan: Verifikasi Token Admin
+
+    // Keamanan: Verifikasi Token Admin/Author
     const token = req.cookies.get("auth_token")?.value;
-    if (!token || !(await verifyToken(token))) {
-      return errorResponse("Tidak diizinkan. Silakan login sebagai admin.", 401);
+    const payload = token ? await verifyToken(token) : null;
+
+    if (!payload) {
+      return errorResponse("Tidak diizinkan. Silakan login.", 401);
     }
 
     const body = await req.json();
-    const { title, content, excerpt, thumbnail, author, tags, published } = body;
+    const { title, content, excerpt, thumbnail, tags, published } = body;
 
     if (!title || !content) {
       return errorResponse("Judul dan konten wajib diisi", 400);
@@ -110,11 +126,12 @@ export async function POST(req: NextRequest) {
       content,
       excerpt: autoExcerpt,
       thumbnail: thumbnail || null,
-      author: author || "Admin",
+      author: payload.name || "Admin",
+      author_id: payload.id, // Simpan ID pembuat
       tags: tags || [],
       published: published ?? false,
       readingTime,
-      views: 0
+      views: 0,
     });
 
     return successResponse(post, undefined, 201);

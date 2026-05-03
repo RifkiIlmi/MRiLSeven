@@ -1,22 +1,31 @@
 import { NextRequest } from "next/server";
-import { verifyAdmin, generateToken } from "@/lib/auth";
+import { authenticateUser, generateToken } from "@/lib/auth";
 import { successResponse, errorResponse } from "@/lib/api-response";
 
 export async function POST(req: NextRequest) {
   try {
     const { email, password } = await req.json();
 
-    const isValid = await verifyAdmin(email, password);
-    if (!isValid) {
+    const user = await authenticateUser(email, password);
+    if (!user) {
       return errorResponse("Email atau password salah", 401);
     }
 
-    const token = await generateToken({ email, role: "admin" });
+    const token = await generateToken({ 
+      id: user.id,
+      email: user.email, 
+      name: user.name,
+      role: user.role 
+    });
 
     const response = successResponse({ 
-      token, 
-      user: { email, role: "admin" } 
+      user: { 
+        email: user.email, 
+        name: user.name,
+        role: user.role 
+      } 
     });
+    
     // Simpan token di httpOnly cookie
     response.cookies.set("auth_token", token, {
       httpOnly: true,

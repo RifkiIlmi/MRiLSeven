@@ -26,7 +26,7 @@ export async function GET(req: NextRequest, { params }: Params) {
       : await BlogPost.findOneAndUpdate(
           { slug: id, published: true },
           shouldIncrement ? { $inc: { views: 1 } } : {},
-          { new: true }
+          { new: true },
         ).lean();
 
     if (!post) {
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest, { params }: Params) {
     }
 
     const response = successResponse(post);
-    
+
     // Set cookie jika view bertambah (berlaku 24 jam)
     if (shouldIncrement) {
       response.cookies.set(viewCookieName, "true", {
@@ -57,35 +57,59 @@ export async function PUT(req: NextRequest, { params }: Params) {
   try {
     await connectDB();
 
-    // Keamanan: Verifikasi Token Admin
+    // Keamanan: Verifikasi Token Admin/Author
     const token = req.cookies.get("auth_token")?.value;
-    if (!token || !(await verifyToken(token))) {
-      return errorResponse("Tidak diizinkan. Silakan login sebagai admin.", 401);
+    const payload = token ? await verifyToken(token) : null;
+    if (!payload) {
+      return errorResponse("Tidak diizinkan. Silakan login.", 401);
     }
 
     const { id } = await params;
+
+    // Cek kepemilikan artikel
+    const existingPost = await BlogPost.findById(id);
+    if (!existingPost) {
+      return errorResponse("Artikel tidak ditemukan", 404);
+    }
+
+    if (payload.role !== "admin" && existingPost.author_id !== payload.id) {
+      return errorResponse(
+        "Akses ditolak. Anda hanya bisa mengubah artikel milik sendiri.",
+        403,
+      );
+    }
+
     const body = await req.json();
     const { title, content, excerpt, thumbnail, published, tags } = body;
 
-    // Auto-generate excerpt jika tidak ada atau kosong
-    const finalExcerpt = excerpt || (content ? content.replace(/[#*`]/g, "").slice(0, 200) + "..." : "");
+    // ... sisa logika update ...
+    const finalExcerpt =
+      excerpt ||
+      (content ? content.replace(/[#*`]/g, "").slice(0, 200) + "..." : "");
 
-    // Hitung estimasi waktu baca
-    let readingTime = 1;
+    let readingTime = existingPost.readingTime;
     if (content) {
       const words = content.trim().split(/\s+/).length;
       readingTime = Math.ceil(words / 200);
     }
 
-    // Re-generate slug jika judul berubah
     let updateData: Record<string, unknown> = {
       content,
       excerpt: finalExcerpt,
       thumbnail,
       published,
       tags: tags || [],
-      readingTime
+      readingTime,
     };
+
+    // Jika artikel lama belum punya author_id, masukkan ID pengubah sekarang
+    if (!existingPost.author_id) {
+      updateData.author_id = payload.id;
+      // Opsional: Update nama author juga jika kosong
+      if (!existingPost.author) {
+        updateData.author = payload.name || "Admin";
+      }
+    }
 
     if (title) {
       const slug = slugify(title, { lower: true, strict: true });
@@ -96,10 +120,6 @@ export async function PUT(req: NextRequest, { params }: Params) {
       returnDocument: "after",
       runValidators: true,
     });
-
-    if (!post) {
-      return errorResponse("Artikel tidak ditemukan", 404);
-    }
 
     return successResponse(post);
   } catch (error) {
@@ -113,19 +133,29 @@ export async function DELETE(req: NextRequest, { params }: Params) {
   try {
     await connectDB();
 
-    // Keamanan: Verifikasi Token Admin
+    // Keamanan: Verifikasi Token Admin/Author
     const token = req.cookies.get("auth_token")?.value;
-    if (!token || !(await verifyToken(token))) {
-      return errorResponse("Tidak diizinkan. Silakan login sebagai admin.", 401);
+    const payload = token ? await verifyToken(token) : null;
+    if (!payload) {
+      return errorResponse("Tidak diizinkan. Silakan login.", 401);
     }
 
     const { id } = await params;
-    const post = await BlogPost.findByIdAndDelete(id);
 
-    if (!post) {
+    // Cek kepemilikan artikel
+    const existingPost = await BlogPost.findById(id);
+    if (!existingPost) {
       return errorResponse("Artikel tidak ditemukan", 404);
     }
 
+    if (payload.role !== "admin" && existingPost.author_id !== payload.id) {
+      return errorResponse(
+        "Akses ditolak. Anda hanya bisa menghapus artikel milik sendiri.",
+        403,
+      );
+    }
+
+    await BlogPost.findByIdAndDelete(id);
     return successResponse(null, undefined, 200, "Artikel berhasil dihapus");
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
