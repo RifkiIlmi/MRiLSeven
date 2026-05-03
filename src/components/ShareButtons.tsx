@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React from "react";
 
 interface ShareButtonsProps {
   title: string;
@@ -8,14 +8,8 @@ interface ShareButtonsProps {
 }
 
 export default function ShareButtons({ title, url }: ShareButtonsProps) {
-  const [currentUrl, setCurrentUrl] = useState("");
-
-  useEffect(() => {
-    setCurrentUrl(window.location.href);
-  }, []);
-
   const encodedTitle = encodeURIComponent(title);
-  const encodedUrl = encodeURIComponent(currentUrl || url);
+  const encodedUrl = encodeURIComponent(url);
 
   const shareLinks = [
     {

@@ -45,7 +45,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
     ],
     content: value,
     onUpdate: ({ editor }) => {
-      // @ts-ignore - getMarkdown exists in tiptap-markdown
+      // @ts-expect-error - getMarkdown exists in tiptap-markdown storage
       const markdown = editor.storage.markdown.getMarkdown();
       onChange(markdown);
     },

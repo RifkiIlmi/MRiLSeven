@@ -26,7 +26,7 @@ export async function GET(req: NextRequest, { params }: Params) {
       : await BlogPost.findOneAndUpdate(
           { slug: id, published: true },
           shouldIncrement ? { $inc: { views: 1 } } : {},
-          { new: true },
+          { returnDocument: "after" },
         ).lean();
 
     if (!post) {
