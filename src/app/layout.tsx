@@ -11,6 +11,14 @@ const lora = Lora({ subsets: ["latin"], variable: "--font-lora" });
 export const metadata: Metadata = {
   title: { template: "%s | MrilSeven", default: "MrilSeven" },
   description: "Blog artikel seputar teknologi dan pengembangan web",
+  icons: {
+    icon: [
+      { url: "/logo-mrilseven-removebg.png?v=1" },
+      { url: "/logo-mrilseven-removebg.png?v=1", sizes: "32x32", type: "image/png" },
+    ],
+    shortcut: "/logo-mrilseven-removebg.png?v=1",
+    apple: "/logo-mrilseven-removebg.png?v=1",
+  },
   openGraph: { type: "website" },
 };
 
@@ -21,7 +29,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id">
-      <body className={`${inter.variable} ${lora.variable} font-sans bg-white flex flex-col min-h-screen`}>
+      <body
+        className={`${inter.variable} ${lora.variable} font-sans bg-white flex flex-col min-h-screen`}
+      >
         <Providers>
           <Navbar />
           <main className="flex-grow max-w-7xl mx-auto px-4 py-12 w-full">
@@ -31,8 +41,12 @@ export default function RootLayout({
             <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-sm">
               <div>© 2024 MrilSeven. All rights reserved.</div>
               <div className="flex gap-6">
-                <Link href="/" className="hover:text-gray-900">Beranda</Link>
-                <Link href="/admin" className="hover:text-gray-900">Admin</Link>
+                <Link href="/" className="hover:text-gray-900">
+                  Beranda
+                </Link>
+                <Link href="/admin" className="hover:text-gray-900">
+                  Admin
+                </Link>
               </div>
             </div>
           </footer>

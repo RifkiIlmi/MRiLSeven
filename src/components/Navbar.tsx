@@ -1,5 +1,7 @@
 "use client";
+
 import Link from "next/link";
+import Image from "next/image";
 import { Suspense } from "react";
 import SearchBar from "./SearchBar";
 import { useAuth } from "./AuthContext";
@@ -10,17 +12,31 @@ export default function Navbar() {
   return (
     <nav className="bg-white/80 backdrop-blur-md border-b border-gray-50 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
-        <Link href="/" className="font-serif font-bold text-3xl tracking-tight text-gray-900">
-          MrilSeven
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative w-10 h-10 overflow-hidden rounded-xl border border-gray-100 shadow-sm transition-transform group-hover:scale-105">
+            <Image 
+              src="/logo-mrilseven-removebg.png" 
+              alt="MrilSeven Logo" 
+              fill
+              sizes="40px"
+              className="object-cover"
+            />
+          </div>
+          <span className="font-serif font-bold text-2xl tracking-tight text-gray-900 group-hover:text-gray-600 transition-colors">
+            MrilSeven
+          </span>
         </Link>
         <div className="hidden md:flex items-center gap-6">
           <Suspense fallback={<div className="w-52 h-8" />}>
             <SearchBar />
           </Suspense>
-          <Link href="/" className="text-gray-600 hover:text-gray-900 text-sm font-medium">
+          <Link
+            href="/"
+            className="text-gray-600 hover:text-gray-900 text-sm font-medium"
+          >
             Beranda
           </Link>
-          
+
           {loading ? (
             <div className="w-20 h-8 bg-gray-100 animate-pulse rounded-lg" />
           ) : user ? (
