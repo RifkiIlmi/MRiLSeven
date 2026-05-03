@@ -3,7 +3,7 @@
 import { useForm, Controller } from "react-hook-form";
 import dynamic from "next/dynamic";
 
-const MarkdownEditor = dynamic(() => import("@/components/MarkdownEditor"), {
+const RichTextEditor = dynamic(() => import("@/components/RichTextEditor"), {
   ssr: false,
   loading: () => <div className="h-[400px] bg-gray-50 animate-pulse rounded-xl" />,
 });
@@ -122,7 +122,7 @@ export default function PostForm({
           />
         </div>
 
-        {/* Content (Markdown) */}
+        {/* Content (Modern Editor) */}
         <div>
           <label className="block text-sm font-bold text-gray-900 mb-2">
             Story Content
@@ -132,7 +132,7 @@ export default function PostForm({
             control={control}
             rules={{ required: "Story content is required" }}
             render={({ field }) => (
-              <MarkdownEditor value={field.value} onChange={field.onChange} />
+              <RichTextEditor value={field.value} onChange={field.onChange} />
             )}
           />
           {errors.content && (
