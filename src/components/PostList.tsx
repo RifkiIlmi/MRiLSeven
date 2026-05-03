@@ -11,17 +11,19 @@ import { API_ENDPOINTS } from "@/lib/constants";
 interface PostListProps {
   page: number;
   search: string;
+  tag?: string;
   initialData?: ApiResponse<PostData[]>;
 }
 
-export default function PostList({ page, search, initialData }: PostListProps) {
+export default function PostList({ page, search, tag, initialData }: PostListProps) {
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["posts", page, search],
+    queryKey: ["posts", page, search, tag],
     queryFn: async () => {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: "9",
         ...(search && { search }),
+        ...(tag && { tag }),
       });
       return fetcher<PostData[]>(`${API_ENDPOINTS.POSTS}?${params}`);
     },

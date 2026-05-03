@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import BlogPost from "@/models/BlogPost";
 import slugify from "slugify";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { verifyToken } from "@/lib/auth";
 
 // GET: Ambil semua post dengan pagination & search
 export async function GET(req: NextRequest) {
@@ -13,11 +14,12 @@ export async function GET(req: NextRequest) {
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
     const search = searchParams.get("search") || "";
+    const tag = searchParams.get("tag") || "";
     const skip = (page - 1) * limit;
 
     // Query filter
     const all = searchParams.get("all") === "true";
-    let filter: any = { published: true };
+    let filter: Record<string, unknown> = { published: true };
     
     if (all) {
       filter = {};
@@ -27,10 +29,21 @@ export async function GET(req: NextRequest) {
       filter = { ...filter, $text: { $search: search } };
     }
 
+    if (tag) {
+      filter = { ...filter, tags: tag };
+    }
+
+    // Sort logic
+    const sortParam = searchParams.get("sort");
+    let sort: { [key: string]: -1 | 1 } = { createdAt: -1 };
+    if (sortParam === "views") {
+      sort = { views: -1 };
+    }
+
     const [posts, total] = await Promise.all([
       BlogPost.find(filter)
         .select("-content") // Jangan kirim konten penuh untuk performa
-        .sort({ createdAt: -1 })
+        .sort(sort)
         .skip(skip)
         .limit(limit)
         .lean(),
@@ -54,6 +67,13 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
+    
+    // Keamanan: Verifikasi Token Admin
+    const token = req.cookies.get("auth_token")?.value;
+    if (!token || !(await verifyToken(token))) {
+      return errorResponse("Tidak diizinkan. Silakan login sebagai admin.", 401);
+    }
+
     const body = await req.json();
     const { title, content, excerpt, thumbnail, author, tags, published } = body;
 

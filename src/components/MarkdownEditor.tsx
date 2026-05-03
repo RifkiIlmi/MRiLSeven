@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
+import rehypeSanitize from "rehype-sanitize";
 
 interface Props {
   value: string;
@@ -82,7 +83,7 @@ export default function MarkdownEditor({ value, onChange }: Props) {
           prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl
           prose-p:text-gray-800 leading-relaxed">
           {value ? (
-            <ReactMarkdown>{value}</ReactMarkdown>
+            <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{value}</ReactMarkdown>
           ) : (
             <p className="text-gray-400 italic">Belum ada konten...</p>
           )}

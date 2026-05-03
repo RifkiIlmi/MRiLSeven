@@ -6,9 +6,15 @@ export function successResponse<T>(
   data: T,
   meta?: PaginationMeta,
   status = 200,
+  message?: string,
 ) {
   return NextResponse.json(
-    { success: true, data, ...(meta && { meta }) },
+    { 
+      success: true, 
+      data, 
+      ...(meta && { meta }),
+      ...(message && { message })
+    },
     { status },
   );
 }
