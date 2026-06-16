@@ -19,6 +19,10 @@
 
 # production
 /build
+/logs
+
+# PM2
+.pm2
 
 # misc
 .DS_Store

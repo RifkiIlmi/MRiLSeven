@@ -64,6 +64,52 @@
    npm run dev
    ```
 
+## 🌐 Panduan Deploy ke Production (PM2 Cluster Mode)
+
+Aplikasi ini telah dikonfigurasi untuk dijalankan di lingkungan produksi dengan menggunakan Next.js **Standalone Build** dan **PM2 Cluster Mode** untuk menjamin performa maksimal, skalabilitas, dan zero-downtime reload.
+
+### 📋 Prasyarat Produksi
+Pastikan PM2 sudah terinstal secara global di server/sistem Anda:
+```bash
+npm install -g pm2
+```
+
+### 🛠️ Langkah-langkah Deploy
+
+1. **Siapkan Environment Variables (`.env.local`)**
+   Pastikan variabel di `.env.local` sudah terisi dengan benar (terutama `MONGODB_URI` untuk koneksi database produksi).
+
+2. **Jalankan Build & Persiapan Standalone**
+   Next.js akan menghasilkan build standalone yang dioptimalkan di `.next/standalone`. Kita juga perlu menyalin aset publik dan statis ke folder tersebut menggunakan script bantuan:
+   ```bash
+   # Jalankan build Next.js
+   npm run build
+   
+   # Salin aset public dan static ke folder standalone
+   node scripts/copy-standalone.js
+   ```
+
+3. **Jalankan Aplikasi dengan PM2**
+   Gunakan script PM2 yang sudah disediakan di `package.json` untuk menjalankan aplikasi:
+   ```bash
+   npm run pm2:start
+   ```
+   *Catatan: `ecosystem.config.js` secara otomatis membaca `.env.local` dan memuat variabel lingkungan tersebut ke dalam cluster PM2.*
+
+### 📊 Perintah Manajemen PM2
+
+Berikut adalah perintah-perintah yang dapat digunakan untuk mengelola aplikasi di production:
+
+| Perintah | Deskripsi |
+| --- | --- |
+| `npm run pm2:status` | Memeriksa status kesehatan dan penggunaan resource dari setiap instance dalam cluster. |
+| `npm run pm2:logs` | Melihat log output dan error secara real-time. |
+| `npm run pm2:restart` | Melakukan restart pada seluruh instance cluster. |
+| `npm run pm2:reload` | Melakukan reload dengan zero-downtime (sangat disarankan saat deploy update baru). |
+| `npm run pm2:stop` | Menghentikan sementara aplikasi tanpa menghapusnya dari PM2. |
+| `npm run pm2:delete` | Menghentikan dan menghapus aplikasi dari daftar manajemen PM2. |
+| `npm run pm2:monit` | Membuka dashboard monitoring terminal PM2 yang interaktif. |
+
 ## 📸 Preview
 - **Beranda**: Menampilkan kartu artikel yang elegan dengan font Serif yang cantik.
 - **Admin**: Dashboard profesional dengan statistik performa real-time.
@@ -72,3 +118,4 @@
 ---
 
 Didesain dengan ❤️ oleh **Rifki Ilmi**
+

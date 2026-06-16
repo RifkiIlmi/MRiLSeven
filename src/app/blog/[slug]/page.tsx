@@ -10,9 +10,11 @@ import Link from "next/link";
 import ShareButtons from "@/components/ShareButtons";
 
 async function getPost(slug: string): Promise<PostData> {
+  const port = process.env.PORT || "3000";
+  const baseUrl = `http://localhost:${port}`;
   try {
     const { data } = await fetcher<PostData>(
-      `${process.env.NEXTAUTH_URL || "http://localhost:3000"}${API_ENDPOINTS.POSTS}/${slug}`,
+      `${baseUrl}${API_ENDPOINTS.POSTS}/${slug}`,
       { cache: "no-store" },
     );
     return data!;

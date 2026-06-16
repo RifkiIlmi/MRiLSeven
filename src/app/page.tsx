@@ -20,7 +20,8 @@ export default async function HomePage({ searchParams }: HomeProps) {
   const tag = params.tag || "";
 
   // Fetch data on server for better performance
-  const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const port = process.env.PORT || "3000";
+  const baseUrl = `http://localhost:${port}`;
   let initialData: ApiResponse<PostData[]> | undefined = undefined;
   let trendingPosts: PostData[] = [];
   let topTags: string[] = [];
