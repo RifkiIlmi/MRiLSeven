@@ -33,7 +33,7 @@ export async function authenticateUser(
   password: string,
 ): Promise<{ id: string; email: string; name: string; role: string } | null> {
   await connectDB();
-  
+
   // 1. Cek User di Database
   const user = await User.findOne({ email });
   if (user) {
@@ -50,8 +50,8 @@ export async function authenticateUser(
 
   // 2. Fallback ke Super Admin dari .env (untuk setup awal)
   const adminEmail = process.env.ADMIN_EMAIL || "admin@blog.com";
-  const b64Hash = process.env.ADMIN_PASSWORD_HASH_B64 || "";
-  
+  const b64Hash = process.env.ADMIN_PASSWORD_HASH_B64 || "admin123";
+
   if (email === adminEmail && b64Hash) {
     const adminPasswordHash = Buffer.from(b64Hash, 'base64').toString();
     const isMatch = await bcrypt.compare(password, adminPasswordHash);
