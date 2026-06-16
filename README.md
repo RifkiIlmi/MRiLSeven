@@ -79,22 +79,19 @@ npm install -g pm2
 1. **Siapkan Environment Variables (`.env.local`)**
    Pastikan variabel di `.env.local` sudah terisi dengan benar (terutama `MONGODB_URI` untuk koneksi database produksi).
 
-2. **Jalankan Build & Persiapan Standalone**
-   Next.js akan menghasilkan build standalone yang dioptimalkan di `.next/standalone`. Kita juga perlu menyalin aset publik dan statis ke folder tersebut menggunakan script bantuan:
+2. **Jalankan Build**
+   Jalankan build Next.js untuk menghasilkan bundel produksi teroptimasi:
    ```bash
-   # Jalankan build Next.js
    npm run build
-   
-   # Salin aset public dan static ke folder standalone
-   node scripts/copy-standalone.js
    ```
 
 3. **Jalankan Aplikasi dengan PM2**
-   Gunakan script PM2 yang sudah disediakan di `package.json` untuk menjalankan aplikasi:
+   Gunakan script PM2 yang sudah disediakan di `package.json` untuk menjalankan aplikasi dalam Cluster Mode:
    ```bash
    npm run pm2:start
    ```
-   *Catatan: `ecosystem.config.js` secara otomatis membaca `.env.local` dan memuat variabel lingkungan tersebut ke dalam cluster PM2.*
+   *Catatan: Next.js akan memuat file `.env.local` secara native saat dijalankan menggunakan perintah `next start`.*
+
 
 ### 📊 Perintah Manajemen PM2
 

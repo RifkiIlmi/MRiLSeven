@@ -15,7 +15,7 @@
     "pm2:status": "pm2 status",
     "pm2:logs": "pm2 logs mrilseven",
     "pm2:monit": "pm2 monit",
-    "deploy": "npm run build && node scripts/copy-standalone.js && npm run pm2:start"
+    "deploy": "npm run build && npm run pm2:start"
   },
   "dependencies": {
     "@tailwindcss/line-clamp": "^0.4.4",
